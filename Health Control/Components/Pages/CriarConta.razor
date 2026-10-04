@@ -1,0 +1,51 @@
+﻿@page "/criar-conta"
+@rendermode InteractiveServer
+@using Health_Control.Services
+
+@inject UsuarioRepositorio Repositorio
+
+@code {
+
+    private string nome = "";
+    private string email = "";
+    private string senha = "";
+    private string funcao = "";
+    private string mensagem = "";
+
+    private void cadastrar ()
+    {
+        bool sucesso = Repositorio.CriarConta(nome.Trim(), email.Trim(), funcao.Trim(), senha);
+
+    if (sucesso)
+        {
+            mensagem = "Conta criada com sucesso0";
+        }
+        else
+        {
+            mensagem = "Esse e-mail jáa está cadastrado";
+        }
+    }
+
+}
+
+<h1>CRIAR CONTA</h1>
+
+<p>Nome</p>
+
+<input type = "text" @bind= "nome"/>
+
+<p>E-mail</p>
+
+<input type = "text" @bind = "email"/>
+
+<p>Senha</p>
+
+<input type = "password" @bind = "senha"/>
+
+<p>Função</p>
+
+<input type = "text" @bind = "funcao"/>
+
+<button @onclick = "cadastrar">Cadastrar</button>
+
+<p>@mensagem</p>
