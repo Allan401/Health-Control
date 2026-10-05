@@ -1,7 +1,23 @@
-﻿@page "/"
+﻿@page "/home"
+@rendermode InteractiveServer
+@using Health_Control.Services
+
+@inject UsuarioRepositorio Repositorio
+@inject NavigationManager Navigation
+
+@code {
+
+    private void ContaErrada ()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+}
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Health Control</h1>
 
-Welcome to your new app.
+<h2>Base operacional do setor</h2>
+
+<p>Não é a sua conta?<button @onclick = "ContaErrada">Conta Errada</button></p>

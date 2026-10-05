@@ -1,8 +1,11 @@
 ﻿@page "/criar-conta"
 @rendermode InteractiveServer
 @using Health_Control.Services
+@using MySqlConnector
+@using System.Text.RegularExpressions
 
 @inject UsuarioRepositorio Repositorio
+@inject NavigationManager Navigation
 
 @code {
 
@@ -14,19 +17,51 @@
 
     private void cadastrar ()
     {
-        bool sucesso = Repositorio.CriarConta(nome.Trim(), email.Trim(), funcao.Trim(), senha);
+        try
+        {
+            if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(funcao) || string.IsNullOrWhiteSpace(senha))
+            {
+                mensagem = "Preencha toodos os campos obrigatórios";
+                return;
+            }
 
-    if (sucesso)
-        {
-            mensagem = "Conta criada com sucesso0";
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                mensagem = "Digite um endereço de e-mail válido";
+                return;
+            }
+
+            if (senha.Length < 6)   
+            {
+                mensagem = "A senha deve ter pelo menos 6 caracteres.";
+                return;
+            }
+
+            bool sucesso = Repositorio.CriarConta(nome.Trim(), email.Trim(), funcao.Trim(), senha);
+
+            if (sucesso)
+            {
+                Navigation.NavigateTo("/home");
+            }
+            else
+            {
+                mensagem = "Esse e-mail jáa está cadastrado";
+            }
         }
-        else
+        catch (MySqlException)
         {
-            mensagem = "Esse e-mail jáa está cadastrado";
+            mensagem = "Não foi possívell se conectar ao servidor, tente novamente mais tarde";
         }
+
     }
 
+    private void IrParaLogin ()
+    {
+        Navigation.NavigateTo("/");
+    }
 }
+
+
 
 <h1>CRIAR CONTA</h1>
 
@@ -44,8 +79,15 @@
 
 <p>Função</p>
 
-<input type = "text" @bind = "funcao"/>
+<select @bind = "funcao">
+    <option value = "">Selecione...</option>
+    <option value = "Vendedor">Vendedor</option>
+    <option value = "Administrativo">Administrativo</option>
+    <option value = "Gestor">Gestor</option>
+</select>
 
 <button @onclick = "cadastrar">Cadastrar</button>
 
 <p>@mensagem</p>
+
+<p>Já tem uma conta?<button @onclick = "IrParaLogin">Voltar ao Login</button></p>

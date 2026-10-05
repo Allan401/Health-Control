@@ -1,41 +1,79 @@
-﻿@page "/login"
+﻿@page "/"
 @rendermode InteractiveServer
 @using Health_Control.Services
+@using MySqlConnector
 
 @inject UsuarioRepositorio Repositorio
+@inject NavigationManager Navigation
 
 @code {
     private string email = "";
-    private string senha = "";
+    private string senha = "";  
     private string mensagem = "";
 
     private void Entrar()
     {
-        var usuarioLogado = Repositorio.BuscarPorEmail(email.Trim());
 
-        if (usuarioLogado != null && BCrypt.Net.BCrypt.Verify(senha, usuarioLogado.SenhaHash))
+        try
         {
-            mensagem = $"Seja bem vindo {usuarioLogado.Nome}!";
+            var usuarioLogado = Repositorio.BuscarPorEmail(email.Trim());
+
+            if (usuarioLogado != null && BCrypt.Net.BCrypt.Verify(senha, usuarioLogado.SenhaHash))
+            {
+                Navigation.NavigateTo("/home");
+            }
+            else
+            {
+                mensagem = "Login incorreto";
+            }
         }
-        else
+        catch (MySqlException)
         {
-            mensagem = "Login incorreto";
+            mensagem = "Não foi possível se conectar a rede, tente novamente mais tarde.";
         }
+
+    }
+
+    private void IrParaCadastro()
+    {
+        Navigation.NavigateTo("/criar-conta");
     }
 }
 
 
-<h1>HEALTH CONTROL</h1>
+<div class = "pagina">
 
-<p>Por favor, digite seu e-mail de login para continuar</p>
+    <div class = "card">
 
-<input type="text" @bind="email" />
+        <div class = "avatar">
 
-<p>Por favoor, digite sua senha</p>
+            <svg viewBox = "0 0 24 24"><path d = "M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path></svg>
 
-<input type="password" @bind="senha" />
+        </div>
 
-<button @onclick="Entrar">Entrar</button>
+        <label>E-mail</label>
+        <input type = "text" @bind = "email"/>
 
-<p>@mensagem</p>
+        <label>Senha</label>
+        <input type = "password" @bind = "senha"/>
 
+        <button class = "entrar" @onclick = "Entrar">ENTRAR</button>
+
+        @if (!string.IsNullOrEmpty(mensagem))
+        {
+            <p class = "mensagem">@mensagem</p>
+        }
+
+        <p class = "link-cadastro">
+
+            Não tem conta? <button @onclick = "IrParaCadastro">Criar conta</button>
+
+        </p>
+
+    </div>
+
+    <h1 class = "titulo">HEALTH<br />CONTROL</h1>
+
+    <h2 class = "sub-titulo">Tecnologia - Confiança - Resultados</h2>
+
+</div>

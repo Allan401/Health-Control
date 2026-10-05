@@ -1,12 +1,6 @@
 ﻿using Health_Control.Models;
 using MySqlConnector;
-<<<<<<< Updated upstream
-=======
-using System.Data;
-using System.Globalization;
-
-namespace Health_Control.Services
->>>>>>> Stashed changes
+using System.Data; // Permite ler colunas do banco pelo nome (GetString, GetGuid, IsDBNull) em vez de só pela posição numérica.
 
 namespace Health_Control.Services
 {
@@ -14,6 +8,8 @@ namespace Health_Control.Services
     {
         private const string StringConexao =
             "Server=localhost;Port=3306;Database=health_inovation;User ID=Allan;Password=Allan#AZ401;";
+
+        // Conexão com a porta com o banco SQL.
 
         public Usuario? BuscarPorEmail(string email)
         {
@@ -29,19 +25,7 @@ namespace Health_Control.Services
 
             if (leitor.Read())
             {
-<<<<<<< Updated upstream
                 return new Usuario
-=======
-                using var conexao = new MySqlConnection(StringConexao);
-                conexao.Open();
-
-                using var comando = new MySqlCommand("SELECT id, nome, email, funcao, senha_hash FROM usuarios WHERE email = @email", conexao);
-                comando.Parameters.AddWithValue("@email", email);
-
-                using var leitor = comando.ExecuteReader();
-
-                if (leitor.Read())
->>>>>>> Stashed changes
                 {
                     Id = leitor.GetGuid("id"),
                     Nome = leitor.GetString("nome"),
@@ -51,21 +35,14 @@ namespace Health_Control.Services
                 };
             }
 
-<<<<<<< Updated upstream
             return null;
         }
 
-        private string GerarHash(string senha)
-=======
-        private String GerarHash(string senha)
+        private static string GerarHash(string senha)
         {
             return BCrypt.Net.BCrypt.HashPassword(senha);
-        }
 
-        public bool CriarConta(string nome, string email, string funcao, string senha)
->>>>>>> Stashed changes
-        {
-            return BCrypt.Net.BCrypt.HashPassword(senha);
+            // Cria um padrão para retornar a cripitografia da senha sempreque necessário.
         }
 
         public bool CriarConta(string nome, string email, string funcao, string senha)
@@ -93,16 +70,8 @@ namespace Health_Control.Services
                 return false;
             }
         }
-<<<<<<< Updated upstream
-=======
 
-            public void DefinirSenha(string email, string senha)
-            {
-
-            string hash = GerarHash(senha);
->>>>>>> Stashed changes
-
-        public void DefinirSenha(string email, string senha)
+        public void DefinirSenha(string email, string senha) // Se o usuário já ter um e-mail cadastrado no banco ele poderá definir uma senha pela página de login.
         {
             string hash = GerarHash(senha);
 
